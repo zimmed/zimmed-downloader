@@ -11,5 +11,5 @@ module.exports = {
         return aes.decrypt(key, content, tag, ts);
     },
 
-    createRSA: (...args) => rsa.create(...args)
+    createRSA: (bits, exp) => rsa.create(bits, exp)
 };

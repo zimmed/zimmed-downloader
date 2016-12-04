@@ -1,7 +1,7 @@
-var _ = require('lodash');
+const _ = require('lodash');
 
 module.exports = {
-    
+
     encode: function (str, inType='utf8') {
         let b = inType !== 'base64' && (new Buffer(str, inType)).toString('base64') || str;
 

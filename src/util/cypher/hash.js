@@ -1,9 +1,9 @@
-var crypto = require('crypto');
-var b64 = require('./b64');
+const crypto = require('crypto');
+const b64 = require('./b64');
 
-var ALG = 'sha1';
+const ALG = 'sha1';
 
-var Hash = module.exports = {
+const Hash = module.exports = {
 
     hash: function (alg, out, key, ...data) {
         let str = data.map(i => JSON.stringify(i)).join(':');
