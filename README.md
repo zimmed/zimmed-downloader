@@ -18,10 +18,10 @@ To deploy, first install all the CLI requirements:
     aria2 - The download utility which utlizies multiple connections (beneficial for premium downloads).
 
 Test the following commands to make sure all packages were properly installed (you can use `$ which <cmd>`):
- - unbuffer
- - plowprobe
- - plowdown
- - aria2c
+- unbuffer
+- plowprobe
+- plowdown
+- aria2c
 
 Next install javascript dependencies: `zimmed-downloader$ npm i`
 
