@@ -6,10 +6,17 @@
  */
 module.exports = {
 
-    serverName: '*****',   // [✓] CHANGE THIS; must be a unique identifier for this server instance.
-                                    //      Be sure to name it something simple and easy to remember, because
-                                    //      you and shared users will need to select the server by this name
-                                    //      when sending download requests from the web client.
+    // Socket Server
+    server: {
+        name: '*****',   // [✓] CHANGE THIS; must be a unique identifier for this server instance.
+                         //      Be sure to name it something simple and easy to remember, because
+                         //      you and shared users will need to select the server by this name
+                         //      when sending download requests from the web client.
+        host: '0.0.0.0',
+        port: 6001,
+        eventPath: 'src/events'
+    },
+
 
     logger: {
         logLevel: 'debug', // [✓] Bunyan logger level. See bunyan node package readme for more info.

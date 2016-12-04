@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "test": "mocha '*/**/*.spec.js'",
-    "server": "node src/index.js"
+    "server": "node app.js",
+    "server-pretty": "npm run server | bunyan"
   },
   "author": "zimmed@zimmed.io",
   "license": "MIT",
