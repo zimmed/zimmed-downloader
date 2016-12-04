@@ -1,5 +1,7 @@
 const cacheRegistry = {};
 
+const NONE = 'It_is_highly_improbably_THAT_this_will_EVER_be_a_STORed+value!';
+
 const simpleCache = module.exports = (id) => {
     return cacheRegistry.hasOwnProperty(id) && cacheRegistry[id] || simpleCache.createCache(id);
 };
@@ -21,6 +23,10 @@ simpleCache.createCache = (id) => {
                     scope[keys[keys.length-1]] = value;
                 }
                 return value;
+            },
+
+            has: (key) => {
+                return cache.get(key, NONE) !== NONE;
             },
 
             get: (key, def) => {
