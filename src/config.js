@@ -1,21 +1,22 @@
 /**
  * Main application config.
  *
- * [✓] Changeable configuration
- * [x] Important configuration value; do not change
+ * [✓] Changeable configuration; local to this server
+ * [-] Paired value; must be consistent with cluster / web server
+ * [x] Important configuration; changing will break the current code
  */
 module.exports = {
 
     // Socket Server
     server: {
-        name: '*****',   // [✓] CHANGE THIS; must be a unique identifier for this server instance.
-                         //      Be sure to name it something simple and easy to remember, because
-                         //      you and shared users will need to select the server by this name
-                         //      when sending download requests from the web client.
-        host: '0.0.0.0',
-        port: 6001,
-        eventPath: 'src/events'
-    },
+        name: 'Server',   // [✓] CHANGE THIS; must be a unique identifier for this server instance.
+                          //      Be sure to name it something simple and easy to remember, because
+                          //      you and shared users will need to select the server by this name
+                          //      when sending download requests from the web client.
+        host: '0.0.0.0', // [✓] 0.0.0.0 will broadcast to all local IPs, where localhost may only broadcast to one.
+        port: 6001, // [✓]
+        eventPath: 'src/events' // [x] Relative path to server events directory
+},
 
 
     logger: {
@@ -33,8 +34,8 @@ module.exports = {
     },
 
     keys: {
-        authHashKey: '*****', // [x] Must be concurrent with web server for HMAC authentication.
-        loginAESKey: '*****'  // [✓] Independent to this server instance, can be any key. This will be used
+        authHashKey: '0000000000000000', // [-] Must be concurrent with web server for HMAC authentication.
+        loginAESKey: '0000000000000000'  // [✓] Independent to this server instance, can be any key. This will be used
                                          //      for AES encryption of fileSharing account logins that are stored in
                                          //      the server memory (for queued downloads). HONOR SYSTEM.
     },
@@ -55,9 +56,9 @@ module.exports = {
     // Captcha-solve service information. 9kweu is recommended (account required), but you may also set `use` to false
     //    to force aborts when captchas are requested. 9kweu referral link: https://www.9kw.eu/register_139321.html
     captcha: {
-        use: false,
-        service: '9kweu',
-        apiKey: '*****',  // Set this or user/pass depending on service requirements - both not needed
+        use: false, // [✓] Use a captcha-solving service
+        service: '9kweu', // [✓] Read `$ man plowdown` for more info
+        apiKey: '*****',  // [✓] Set this or user/pass depending on service requirements - both not needed
         user: null,
         pass: null,
     }
