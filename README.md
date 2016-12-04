@@ -18,10 +18,10 @@ To deploy, first install all the CLI requirements:
     aria2 - The download utility which utlizies multiple connections (beneficial for premium downloads).
 
 Test the following commands to make sure all packages were properly installed (you can use `$ which <cmd>`):
- - unbuffer
- - plowprobe
- - plowdown
- - aria2c
+- unbuffer
+- plowprobe
+- plowdown
+- aria2c
 
 Next install javascript dependencies: `zimmed-downloader$ npm i`
 
@@ -29,11 +29,11 @@ Update configuration in `src/config.js` and `src/test-config.js`
 
 [Optional] Run unit tests: `zimmed-downloader$ npm test`
 
-#### Not yet ready for test -- no driver
-
 Test server from CLI: `zimmed-downloader$ npm run server`
 
-It is recommended to use a utility for managing the node service, like pm2, for deployment stability.
+_Or if you have previously installed bunyan globally `$ npm i -g bunyan` you can use `zimmed-downloader$ npm run server-pretty`._
+
+It is recommended to use a utility for managing the node service, like [pm2](https://github.com/Unitech/pm2 "pm2"), for deployment stability.
 
 ### Legal
 

@@ -15,7 +15,6 @@ const TEMP_DIR_MASK = 'dl-XXXXXXXX';
 const Manager = module.exports = {
 
     create: ({
-        id='singleManager',
         maxConcurrent=4,
         maxConnections=4,
         maxSpeed=0,
@@ -30,12 +29,6 @@ const Manager = module.exports = {
         onDLQueued=_.noop
     }={}) => {
         let m = Object.defineProperties({}, {
-            id: {
-                writable: false,
-                configurable: false,
-                enumerable: true,
-                value: id
-            },
             queue: {
                 writable: false,
                 configurable: false,
