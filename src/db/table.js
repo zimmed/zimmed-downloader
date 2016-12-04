@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const r = require('rethinkdb');
 const {promiseRun} = require('./connection');
-const cache = require('../util/simplecache')('db');
+const cache = require('../util/simple-cache')('db');
 const timestamp = require('../util/timestamp');
 const Config = require('../config').database;
 

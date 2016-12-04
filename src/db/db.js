@@ -1,6 +1,6 @@
 const r = require('rethinkdb');
 const Promise = require('bluebird');
-const cache = require('../util/simplecache')('db');
+const cache = require('../util/simple-cache')('db');
 const logger = require('../logger');
 const timestamp = require('../util/timestamp');
 const Table = require('./table');

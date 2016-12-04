@@ -1,5 +1,5 @@
 const Config = require('../config').database;
-const logger = require('../util/logger');
+const logger = require('../logger');
 const r = require('rethinkdb');
 
 let connection = null;

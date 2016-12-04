@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const cache = require('../util/simplecache')('auth');
+const cache = require('../util/simple-cache')('auth');
 const key = require('../config').keys.authHashKey;
 const hash = require('../util/cypher/hash');
 const createKey = require('../util/cypher').createRSA;

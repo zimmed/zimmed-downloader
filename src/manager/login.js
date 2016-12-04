@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const key = require('../config').keys.loginAESKey;
 const cypher = require('../util/cypher');
-const Cache = require('../util/simplecache');
+const Cache = require('../util/simple-cache');
 const timestamp = require('../util/timestamp');
 const cache = Cache('logins');
 
