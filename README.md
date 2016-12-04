@@ -29,9 +29,8 @@ Update configuration in `src/config.js` and `src/test-config.js`
 
 [Optional] Run unit tests: `zimmed-downloader$ npm test`
 
-#### Not yet ready for test -- no driver
-
 Test server from CLI: `zimmed-downloader$ npm run server`
+_Or if you have previously installed bunyan globally `$ npm i -g bunyan` you can use `zimmed-downloader$ npm run server-pretty`.
 
 It is recommended to use a utility for managing the node service, like pm2, for deployment stability.
 
