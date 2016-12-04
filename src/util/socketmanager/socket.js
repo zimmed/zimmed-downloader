@@ -33,19 +33,27 @@ const Socket = module.exports = {
         });
     },
 
-    init: function init(cb=_.noop, sm=this) {
-        sm.connectionGroup.on('connection', (client) => {
-            sm.eventManager.handle('connection', {}, sm.model, sm.filter(client));
-            Object.keys(sm.eventManager.routes).forEach((e) => {
-                if (e !== 'connection') {
-                    client.on(e, (data) => sm.eventManager.handle(e, data, sm.model, sm.filter(client)));
-                }
+    init: function init(sm=this) {
+        return new Promise((resolve, reject) => {
+            sm.connectionGroup.on('connection', (client) => {
+                sm.eventManager.handle('connection', {}, sm.model, sm.filter(client));
+                Object.keys(sm.eventManager.routes).forEach((e) => {
+                    if (e !== 'connection') {
+                        client.on(e, (data) => sm.eventManager.handle(e, data, sm.model, sm.filter(client)));
+                    }
+                });
             });
+            try {
+                sm.httpServer.listen(sm.port, () => {
+                    resolve(sm);
+                });
+            } catch (e) {
+                reject(e);
+            }
         });
-        sm.httpServer.listen(sm.port, () => { cb(sm); });
     },
 
-    create: function create(name, host, port, model, eventManager) {
+    create: function create(name='default', host, port, model=null, eventManager) {
         if (SMRegistry.hasOwnProperty(name)) {
             throw `Socket Manager for '${name}' is already defined.`;
         }
