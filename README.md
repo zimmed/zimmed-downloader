@@ -33,7 +33,7 @@ Test server from CLI: `zimmed-downloader$ npm run server`
 
 _Or if you have previously installed bunyan globally `$ npm i -g bunyan` you can use `zimmed-downloader$ npm run server-pretty`._
 
-It is recommended to use a utility for managing the node service, like pm2, for deployment stability.
+It is recommended to use a utility for managing the node service, like [pm2](https://github.com/Unitech/pm2 "pm2"), for deployment stability.
 
 ### Legal
 
