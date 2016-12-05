@@ -4,15 +4,16 @@ const DownloadManager = require('./manager');
 const Server = require('./server');
 const logger = require('./logger');
 const Config = require('./config');
+const Container = require('./manager/container');
 const UPDATE_CHANNEL = require('./events/queue/channel');
 
 let SM = null;
 const getSM = () => SM ? Promise.resolve(SM) : Promise.reject() ;
 
 module.exports = () => {
-    DownloadManager.clearOutActive()
-        .then(() => DownloadManager.getPreviouslyQueued())
-        .then(queued => _.isArray(queued) && queued.length && queued)
+    DownloadManager.dbClearActive()
+        .then(() => DownloadManager.dbGetQueued())
+        .then(queued => _.isArray(queued) && _.map(queued, f => Container.createFromDB(f)))
         .then(queued => DownloadManager.create(mgrOpts, queued))
         .then(downloadManager => Server(downloadManager))
         .then(init => init())
@@ -36,20 +37,12 @@ const mgrOpts = _.assign({
 
 function queueChange(mgr, con) {
     getSM().then(sm => {
-        sm.group().broadcast('mgr-queue-change', con.strip());
+        sm.group().broadcast('mgr-queue-change', con.stripForPub());
     });
 }
 
 function queueUpdate(mgr, con) {
-    const progressProperties = [
-        'transferred',
-        'total',
-        'eta',
-        'rate',
-        'progress'
-    ];
-
     getSM().then(sm => {
-        sm.group(UPDATE_CHANNEL).broadcast('mgr-queue-update', con.strip(progressProperties));
+        sm.group(UPDATE_CHANNEL).broadcast('mgr-queue-update', con.stripForUpdate());
     });
 }

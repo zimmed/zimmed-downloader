@@ -14,34 +14,19 @@ const State = {
     COMPLETE: 'COMPLETE'
 };
 const OK = 0;
-const publicProperties = [
-    'state',
-    'dir',
-    'name',
-    'size',
-    'url',
-    'log'
-];
 
 const Container = module.exports = {
 
-    create: (dir, metadata, login) => {
-        if (metadata.state !== OK) {
-            throw new Error('Cannot create download container for item with bad link: ' + metadata.url);
-        }
-        if (login) {
-            login = Login.set(login.domain, login.user, login.pass);
-        }
-
+    createFromDB: ({state, dir, name, size, url, log, login}) => {
         return {
-            state: State.READY,
-            login: login,
-            name: metadata.name,
-            dir: dir,
-            file: path.join(dir, metadata.name),
-            size: metadata.size,
-            url: metadata.url,
-            log: null,
+            state,
+            login,
+            name,
+            dir,
+            file: path.join(dir, name),
+            size: size,
+            url,
+            log,
             src: null,
             cookie: null,
             transferred: null,
@@ -49,19 +34,53 @@ const Container = module.exports = {
             progress: 0,
             eta: null,
             connections: 0,
-            strip: function (include) {
-                return Container.stripForDb(this, include);
+            stripForUpdate: function () {
+                return Container.stripForUpdate(this);
+            },
+            stripForPub: function () {
+                return Container.stripForPub(this);
+            },
+            stripForDB: function () {
+                return Container.stripForDB(this);
             }
         };
+    },
+
+    create: (dir, metadata, login) => {
+        if (metadata.state !== OK) {
+            throw new Error('Cannot create download container for item with bad link: ' + metadata.url);
+        }
+        if (login) {
+            Login.set(login.domain, login.user, login.pass);
+        }
+
+        return Container.createFromDB({
+            state: State.READY,
+            login: login.domain,
+            name: metadata.name,
+            dir,
+            size: metadata.size,
+            url: metadata.url,
+            log: null
+        });
     },
 
     update: (container, data) => {
         return Object.assign(container, data);
     },
 
-    stripForDb: (container, include=[]) => {
-        return _.assign(_.pick(container, _.concat(publicProperties, include)), {id: container.url});
+    stripForDB: ({state, login, dir, name, size, url, log}) => {
+        return {id: url, state, login, dir, name, size, url, log};
+    },
+
+    stripForPub: ({state, dir, name, size, url, log}) => {
+        return {state, dir, name, size, url, log};
+    },
+
+    stripForUpdate: ({url, transferred, rate, progress, eta, connections}) => {
+        return {url, update: {transferred, rate, progress, eta, connections}};
     }
+
 };
 
 Container.State = State;

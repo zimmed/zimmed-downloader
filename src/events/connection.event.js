@@ -1,13 +1,14 @@
 const _ = require('lodash');
+const Promise = require('bluebird');
 const logger = require('../logger');
 const Auth = require('../auth');
+const Manager = require('../manager');
 
 module.exports = function connection(mgr) {
-    let simpleQ = {
-        active: _.map(mgr.active, c => { return {name: c.name, state: c.state}; }),
-        queue: _.map(mgr.queue, c => { return {name: c.name, state: c.state}; })
-    };
-
     logger.info(`Client connected. ID: ${this.client.id}`);
-    this.client.emit('mgr-file-list', Auth.response(simpleQ));
+    Promise
+        .all(Manager.dbGetActive(), Manager.dbGetQueued())
+        .spread((active, queued) => {
+            this.client.emit('mgr-queue-list', Auth.response({active, queued}));
+        });
 };
