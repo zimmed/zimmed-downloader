@@ -5,6 +5,7 @@
  * [-] Paired value; must be consistent with cluster / web server
  * [x] Important configuration; changing will break the current code
  */
+
 module.exports = {
 
     // Socket Server
@@ -15,8 +16,10 @@ module.exports = {
                           //      when sending download requests from the web client.
         host: '0.0.0.0', // [✓] 0.0.0.0 will broadcast to all local IPs, where localhost may only broadcast to one.
         port: 6001, // [✓]
-        eventPath: 'src/events', // [x] Relative path to server events directory
-        updateChannel: 'queue' // [✓] Socket room name to join to receive active updates from download queue
+        channels: {
+            default: {eventPath: 'src/events'}, // [x] Relative path to server events directory for default socket channel
+            queue: {eventPath: 'src/events/queue'} // [x] Event path for queue updates channel
+        },
     },
 
     keys: {
@@ -36,13 +39,17 @@ module.exports = {
         pass: null,
     },
 
+    downloader: {
+        autoStart: true, // [✓] Automatically start downloader when a queue is available
+    },
+
     libraries: {
-        tv: '/mnt/nas/share/television',
-        movies: '/mnt/nas/share/movies',
-        music: '/mnt/nas/share/music',
-        apps: '/mnt/nas/share/software',
-        documents: '/mnt/nas/share/documents',
-        other: '/mnt/nas/share/misc'
+        tv: '/mnt/nas/share/television', // [✓] Path to TV library
+        movies: '/mnt/nas/share/movies', // [✓] Path to Movies library
+        music: '/mnt/nas/share/music', // [✓] Path to Music library
+        apps: '/mnt/nas/share/software', // [✓] Path to Software/Games library
+        documents: '/mnt/nas/share/documents', // [✓] Path to EBooks/Documents library
+        other: '/mnt/nas/share/misc' // [✓] Path to directory for all other downloads
     },
 
     // Configuration for RSA key generation. This is used in the key-pair generation for each connected session,

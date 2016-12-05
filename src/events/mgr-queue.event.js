@@ -3,10 +3,11 @@ const Manager = require('../manager');
 const Downloader = require('../downloader');
 const createError = require('./error');
 const Config = require('../config');
+const Auth = require('../auth');
 
 module.exports = function mgrQueue(mgr, data) {
     let {destination, login, urls} = data,
-        out = _.map(urls, url => { return {url, success: false, error: 'bad link'}; });
+        out = _.map(urls, url => { return {url, success: false, error: 'bad link'}; }),
         dir = _.get(Config.libraries, destination, false);
 
     return dir && urls
@@ -16,12 +17,12 @@ module.exports = function mgrQueue(mgr, data) {
                 tryQ(mgr, dir, login, metadata)
             )))
             .then(() => {
-                this.client.emit('mgr-queue.success', out);
+                this.client.emit('mgr-queue.success', Auth.response(out));
             })
             .catch(e => {
-                this.client.emit('mgr-queue.failure', createError('400', e));
+                this.client.emit('mgr-queue.failure', Auth.response(createError('400', e)));
             })
-        : this.client.emit('mgr-queue.failure', createError('400'));
+        : this.client.emit('mgr-queue.failure', Auth.response(createError('400')));
 };
 
 function tryQ(mgr, dir, login, metadata) {

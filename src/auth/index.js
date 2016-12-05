@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const cache = require('../util/simple-cache')('auth');
-const key = require('../config').keys.authHashKey;
+const KEY = require('../config').keys.authHashKey;
 const timestamp = require('../util/timestamp');
 const hash = require('../util/cypher/hash');
 const createKey = require('../util/cypher').createRSA;
@@ -10,18 +10,28 @@ const REQUEST_TIMEOUT = 2000;
 
 const Auth = {
 
+    HMAC: (key, ...data) => {
+        return hash.base64(key, hash.base64(key, ...data));
+    },
+
+    response: data => {
+        let ts = timestamp('ms');
+
+        return {hmac: Auth.HMAC(KEY, ts, data), ts, data};
+    },
+
     hmacIsValid: (hmac, ts, ...data) => {
         let vTime = parseInt(ts) < timestamp('ms') + REQUEST_TIMEOUT;
 
-        return vTime && hmac === hash.base64(key, hash.base64(key, ts, ...data));
+        return vTime && hmac === Auth.HMAC(KEY, ts, ...data);
     },
 
     session: (sessionId) => {
         return cache.get(sessionId, null);
     },
 
-    parseRequest: ({hmac, ts, sessionId, data}) => {
-        let auth = Auth.session(sessionId),
+    parseRequest: ({hmac, ts, sessionId, data}, cachedSessionId) => {
+        let auth = cachedSessionId === sessionId && Auth.session(sessionId),
             parsed;
 
         if (auth && Auth.hmacIsValid(hmac, ts, sessionId, data)) {
@@ -44,8 +54,8 @@ const Auth = {
     },
 
     generateId: (seed) => {
-        let k = _.shuffle(key.split('')).join('');
-            id = hash.base64(k, hash.base64(key, seed, timestamp('ms')));
+        let k = _.shuffle(KEY.split('')).join(''),
+            id = Auth.HMAC(k, seed, timestamp('ms'));
 
         return cache.has(id) && Auth.generateId(seed) || id;
     }

@@ -2,15 +2,29 @@ const express = require('express');
 const http = require('http');
 const _ = require('lodash');
 const io = require('socket.io');
-
-const SMRegistry = {};
-const httpServer = http.createServer(express());
-const ioServer = io(httpServer, {serveClient: false});
+const cache = require('../simple-cache')('sm-registry');
 
 const Socket = module.exports = {
 
     get: name => {
-        return _.get(SMRegistry, name, null);
+        return cache.get(name, null);
+    },
+
+    setup: (sm, groups) => {
+        _.forEach(groups, ({em, middleware, channel}) => {
+            if (middleware && _.isFunction(middleware)) {
+                sm.group(channel).use(middleware);
+            }
+            sm.group(channel).on('connection', client => {
+                em.handleDirect('connection', {}, sm.model, sm.filter(client));
+                _.forEach(_.keys(em.routes), e => {
+                    if (e !== 'connection') {
+                        client.on(e, data => em.handle(e, data, sm.model, sm.filter(client)));
+                    }
+                });
+            });
+        });
+        return cache.set(`${sm.host}:${sm.port}`, sm);
     },
 
     filter: function filter(client, sm=this) {
@@ -21,31 +35,15 @@ const Socket = module.exports = {
                 enumerable: true
             },
             server: {
-                value: sm.connectionServer,
-                writable: false,
-                enumerable: true
-            },
-            group: {
-                value: sm.connectionGroup,
+                value: sm,
                 writable: false,
                 enumerable: true
             }
         });
     },
 
-    init: function init(middleware, sm=this) {
-        if (middleware && _.isFunction(middleware)) {
-            sm.connectionGroup.use(middleware);
-        }
+    init: function init(groups, sm=this) {
         return new Promise((resolve, reject) => {
-            sm.connectionGroup.on('connection', (client) => {
-                sm.eventManager.handleDirect('connection', {}, sm.model, sm.filter(client));
-                _.forEach(_.keys(sm.eventManager.routes), e => {
-                    if (e !== 'connection') {
-                        client.on(e, data => sm.eventManager.handle(e, data, sm.model, sm.filter(client)));
-                    }
-                });
-            });
             try {
                 sm.httpServer.listen(sm.port, () => {
                     resolve(sm);
@@ -56,11 +54,14 @@ const Socket = module.exports = {
         });
     },
 
-    create: function create(name, host, port, model=null, eventManager) {
-        if (SMRegistry.hasOwnProperty(name)) {
-            throw `Socket Manager for '${name}' is already defined.`;
+    create: function create(host, port, eventGroups, model=null) {
+        const httpServer = http.createServer(express());
+        const ioServer = io(httpServer, {serveClient: false});
+
+        if (cache.has(`${host}:${port}`)) {
+            throw `Socket Manager for '${host}:${port}' is already defined.`;
         }
-        SMRegistry[name] = Object.defineProperties(Object.create(this), {
+        return Socket.setup(Object.defineProperties(_.create(this), {
             model: {
                 value: model,
                 writable: true,
@@ -76,34 +77,19 @@ const Socket = module.exports = {
                 writable: false,
                 enumerable: true
             },
-            name: {
-                value: name,
-                writable: false,
-                enumerable: true
-            },
             httpServer: {
-                get: () => {
-                    return httpServer;
-                },
+                get: () => httpServer,
                 enumerable: false
             },
             connectionServer: {
-                get: () => {
-                    return ioServer;
-                },
+                get: () => ioServer,
                 enumerable: false
             },
-            connectionGroup: {
-                value: ioServer.of('/' + name),
+            group: {
+                value: (channel) => ioServer.of('/' + channel),
                 writable: false,
                 enumerable: false
-            },
-            eventManager: {
-                value: eventManager,
-                enumerable: false,
-                writable: false
             }
-        });
-        return SMRegistry[name];
+        }));
     }
 };

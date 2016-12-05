@@ -64,14 +64,14 @@ const Manager = module.exports = {
                     maxConnections,
                     maxSpeed,
                     progressTickRate,
-                    onDLProgress,
-                    onDLBegin,
-                    onDLEnd,
-                    onDLComplete,
-                    onDLProcess,
-                    onDLError,
-                    onDLPause,
-                    onDLQueued
+                    onDLProgress: (...args) => onDLProgress(m, ...args),
+                    onDLBegin: (...args) => onDLBegin(m, ...args),
+                    onDLEnd: (...args) => onDLEnd(m, ...args),
+                    onDLComplete: (...args) => onDLComplete(m, ...args),
+                    onDLProcess: (...args) => onDLProcess(m, ...args),
+                    onDLError: (...args) => onDLError(m, ...args),
+                    onDLPause: (...args) => onDLPause(m, ...args),
+                    onDLQueued: (...args) => onDLQueued(m, ...args)
                 }
             }
         });
@@ -137,7 +137,7 @@ const Manager = module.exports = {
             .then(() => Container.update(con, {state: State.DOWNLOADING}))
             .then(() => Downloader.download(opts, con.src, con.name, con.cookie))
             .then(filePath => Manager.moveFile(mgr, con, filePath))
-            .then(finalPath => Container.update(con, {file: finalPath, state: State.COMPLETE}))
+            .then(finalPath => Manager.completeDownload(mgr, con, finalPath))
             .catch(error => Manager.handleError(mgr, opts, con, error))
             .finally(() => Manager.endDownload(mgr, con));
     },
@@ -146,6 +146,11 @@ const Manager = module.exports = {
         Container.update(con, {state: State.PROCESSING});
         mgr.opts.onDLProcess(con);
         return mv(filePath, con.file);
+    },
+
+    completeDownload: (mgr, con, finalPath) => {
+        Container.update(con, {file: finalPath, state: State.COMPLETE});
+        mgr.opts.onDLComplete(con);
     },
 
     handleError: (mgr, opts, con, error) => {
