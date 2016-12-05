@@ -17,6 +17,10 @@ describe('Metadata retriever', () => {
             metadata(Config.rgLink)
                 .then(data => {
                     expect(data).to.be.ok;
+                    expect(data).to.be.an('array');
+                    expect(data.length).to.equal(1);
+                    data = data[0];
+                    expect(data).to.be.ok;
                     expect(data).to.be.an('Object');
                     expect(data).to.have.property('name');
                     expect(data).to.have.property('state');

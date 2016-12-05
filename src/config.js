@@ -16,21 +16,6 @@ module.exports = {
         host: '0.0.0.0', // [✓] 0.0.0.0 will broadcast to all local IPs, where localhost may only broadcast to one.
         port: 6001, // [✓]
         eventPath: 'src/events' // [x] Relative path to server events directory
-},
-
-
-    logger: {
-        logLevel: 'debug', // [✓] Bunyan logger level. See bunyan node package readme for more info.
-        logName: 'Downloader' // [✓] This can literally be whatever you want. Has no impact on anything.
-    },
-
-    // Database is not currently used.
-    database: {
-        host: 'localhost',
-        port: '32778',
-        name: 'Downloader',
-        readyTimeout: 10000, // ms
-        readyTimeoutTick: 5 // ms
     },
 
     keys: {
@@ -38,6 +23,25 @@ module.exports = {
         loginAESKey: '0000000000000000'  // [✓] Independent to this server instance, can be any key. This will be used
                                          //      for AES encryption of fileSharing account logins that are stored in
                                          //      the server memory (for queued downloads). HONOR SYSTEM.
+    },
+
+    // Captcha-solve service information. 9kweu is recommended (account required), but you may also set `use` to false
+    //    to force aborts when captchas are requested. 9kweu referral link: https://www.9kw.eu/register_139321.html
+    captcha: {
+        use: false, // [✓] Use a captcha-solving service
+        service: '9kweu', // [✓] Read `$ man plowdown` for more info
+        apiKey: '*****',  // [✓] Set this or user/pass depending on service requirements - both not needed
+        user: null,
+        pass: null,
+    },
+
+    libraries: {
+        tv: '/mnt/nas/share/television',
+        movies: '/mnt/nas/share/movies',
+        music: '/mnt/nas/share/music',
+        apps: '/mnt/nas/share/software',
+        documents: '/mnt/nas/share/documents',
+        other: '/mnt/nas/share/misc'
     },
 
     // Configuration for RSA key generation. This is used in the key-pair generation for each connected session,
@@ -53,13 +57,17 @@ module.exports = {
                     //  algorithm.
     },
 
-    // Captcha-solve service information. 9kweu is recommended (account required), but you may also set `use` to false
-    //    to force aborts when captchas are requested. 9kweu referral link: https://www.9kw.eu/register_139321.html
-    captcha: {
-        use: false, // [✓] Use a captcha-solving service
-        service: '9kweu', // [✓] Read `$ man plowdown` for more info
-        apiKey: '*****',  // [✓] Set this or user/pass depending on service requirements - both not needed
-        user: null,
-        pass: null,
+    // Database is not currently used.
+    database: {
+        host: 'localhost',
+        port: '32778',
+        name: 'Downloader',
+        readyTimeout: 10000, // ms
+        readyTimeoutTick: 5 // ms
+    },
+
+    logger: {
+        logLevel: 'debug', // [✓] Bunyan logger level. See bunyan node package readme for more info.
+        logName: 'Downloader' // [✓] This can literally be whatever you want. Has no impact on anything.
     }
 };
