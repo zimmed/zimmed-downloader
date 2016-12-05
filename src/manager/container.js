@@ -14,6 +14,14 @@ const State = {
     COMPLETE: 'COMPLETE'
 };
 const OK = 0;
+const publicProperties = [
+    'state',
+    'dir',
+    'name',
+    'size',
+    'url',
+    'log'
+];
 
 const Container = module.exports = {
 
@@ -33,18 +41,26 @@ const Container = module.exports = {
             file: path.join(dir, metadata.name),
             size: metadata.size,
             url: metadata.url,
+            log: null,
             src: null,
             cookie: null,
             transferred: null,
             rate: null,
             progress: 0,
             eta: null,
-            connections: 0
+            connections: 0,
+            strip: function (include) {
+                return Container.stripForDb(this, include);
+            }
         };
     },
 
     update: (container, data) => {
         return Object.assign(container, data);
+    },
+
+    stripForDb: (container, include=[]) => {
+        return _.assign(_.pick(container, _.concat(publicProperties, include)), {id: container.url});
     }
 };
 

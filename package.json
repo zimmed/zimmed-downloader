@@ -23,6 +23,7 @@
     "lodash": "^4.17.2",
     "mktemp": "^0.4.0",
     "node-rsa": "^0.4.2",
+    "rethinkdb": "^2.3.3",
     "rmdir": "^1.2.0",
     "socket.io": "^1.7.1"
   }

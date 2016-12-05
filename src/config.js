@@ -65,7 +65,7 @@ module.exports = {
                     //  algorithm.
     },
 
-    // Database is not currently used.
+    // [✓] RethinkDB configuration
     database: {
         host: 'localhost',
         port: '32778',

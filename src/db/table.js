@@ -28,7 +28,7 @@ const Table = module.exports = {
         return table.exec(table.scope, true);
     },
 
-    new: function (doc_or_docs, table=this) {
+    insert: function (doc_or_docs, table=this) {
         return table.exec(table.scope.insert(doc_or_docs));
     },
 
