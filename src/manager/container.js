@@ -42,6 +42,7 @@ const Container = module.exports = {
             connections: 0
         };
     },
+
     update: (container, data) => {
         return Object.assign(container, data);
     }

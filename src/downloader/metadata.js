@@ -33,7 +33,7 @@ const metadata = module.exports = (...urls) => {
             probe.stderr.on('data', data => error += data.toString());
             probe.on('exit', code => {
                 if (files.length) {
-                    resolve(files.length > 1 ? files : files[0]);
+                    resolve(files);
                 } else {
                     reject(new Error(`Plowprobe failed [${code}]: ${error}`));
                 }

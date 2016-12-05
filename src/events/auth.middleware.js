@@ -2,8 +2,8 @@ const createError = require('./error');
 const Auth = require('../auth');
 const logger = require('../logger');
 
-module.exports = function auth(next, model, data) {
-    let parsed = Auth.parseRequest(data);
+module.exports = function auth(next, model, event) {
+    let parsed = Auth.parseRequest(event);
 
     if (parsed === null) {
         logger.debug(`Auth Middleware rejected for ${this.client.id}: ${(JSON).stringify(parsed)}`);
