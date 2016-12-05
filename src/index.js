@@ -2,7 +2,7 @@ const DownloadManager = require('./manager');
 const Server = require('./server');
 const logger = require('./logger');
 
-const main = module.exports = () => {
+module.exports = () => {
     let model = DownloadManager.create(),
         init = Server(model);
 

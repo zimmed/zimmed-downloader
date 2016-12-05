@@ -15,7 +15,8 @@ module.exports = {
                           //      when sending download requests from the web client.
         host: '0.0.0.0', // [✓] 0.0.0.0 will broadcast to all local IPs, where localhost may only broadcast to one.
         port: 6001, // [✓]
-        eventPath: 'src/events' // [x] Relative path to server events directory
+        eventPath: 'src/events', // [x] Relative path to server events directory
+        updateChannel: 'queue' // [✓] Socket room name to join to receive active updates from download queue
     },
 
     keys: {
