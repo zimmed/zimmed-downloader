@@ -31,7 +31,6 @@ module.exports = {
     off: this.deregister,
 
     handleDirect: function (eventName, eventData, model, self, em=this) {
-        console.log('final...');
         if (em.routes.hasOwnProperty(eventName)) {
             _.forEach(em.routes[eventName], r => {
                 r.handler.apply(self, [model, eventData]);
@@ -48,13 +47,10 @@ module.exports = {
     handle: function (eventName, eventData, model, self, em=this) {
         let i = 0,
             next = (m, eData) => {
-                console.log('next...');
                 return i < em.middle.length ?
                     em.middle[i++].handler.apply(self, [next, m || model, eData || eventData]) :
                     em.handleDirect(eventName, eData || eventData, m || model, self);
             };
-
-        console.log('handle...');
         next(model, eventData);
     },
 
@@ -74,12 +70,12 @@ module.exports = {
 
         if (eventPath) {
             // Discover middleware
-            _.forEach(glob.sync(eventPath + '/**/*.middleware.js'), ef => {
+            _.forEach(glob.sync(eventPath + '/*.middleware.js'), ef => {
                 ef = path.relative(__dirname, ef);
                 em.use(require(`./${ef}`));
             });
             // Discover events
-            _.forEach(glob.sync(eventPath + '/**/*.event.js'), ef => {
+            _.forEach(glob.sync(eventPath + '/*.event.js'), ef => {
                 let name = ef.substring(ef.lastIndexOf('/') + 1, ef.indexOf('.event.js'));
 
                 ef = path.relative(__dirname, ef);

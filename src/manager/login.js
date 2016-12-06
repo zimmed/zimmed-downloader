@@ -3,42 +3,52 @@ const key = require('../config').keys.loginAESKey;
 const cypher = require('../util/cypher');
 const Cache = require('../util/simple-cache');
 const timestamp = require('../util/timestamp');
-const cache = Cache('logins');
+const dbTable = require('../db').table('download-logins');
 
 
 const Login = module.exports = {
 
-    create: (user, pass, ts) => {
+    create: (domain, user, pass) => {
         user = cypher.encrypt(user, key);
         pass = cypher.encrypt(pass, key);
-        return {
-            ts,
-            decrypt: () => {
-                return {
-                    user: cypher.decrypt(user, key),
-                    pass: cypher.decrypt(pass, key)
-                };
-            }
-        };
+        return {id: domain, user, pass};
     },
 
-    set: (domain, user, pass, ts) => {
-        if (ts > Login.getTime(domain)) {
-            cache.set(domain, Login.create(user, pass, ts));
-        }
-        return domain;
+    set: (domain, username, password, ts) => {
+        return Login.getTime(domain)
+            .then(time => {
+                if (ts > time) {
+                    let {id, user, pass} = Login.create(domain, username, password);
+
+                    return time && dbTable.update(id, {user, pass, ts}) || dbTable.insert({id, user, pass, ts});
+                }
+                return domain;
+            })
+            .then(() => domain);
     },
 
     get: (domain) => {
-        return domain && cache.get(`${domain}.decrypt`, _.noop)() || {};
+        return Login.getData(domain)
+            .then(data => {
+                return {
+                    user: cypher.decrypt(data.user, key),
+                    pass: cypher.decrypt(data.pass, key)
+                };
+            });
     },
 
     getTime: (domain) => {
-        return domain && cache.get(`${domain}.ts`) || 0;
+        return Login.getData(domain)
+            .then(data => data.ts)
+            .catch(() => 0)
+    },
+
+    getData: (domain) => {
+        return domain && dbTable.get(domain) || Promise.reject('Login.getData: No domain provided');
     },
 
     clear: (domain) => {
-        return domain && cache.del(domain) || Cache.wipe(cache);
+        return domain && dbTable.delete(domain) || dbTable.deleteAll();
     },
 
     // getLoginForDownload: (url) => {

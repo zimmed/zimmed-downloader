@@ -28,7 +28,11 @@ const Table = module.exports = {
         return table.exec(table.scope, true);
     },
 
-    new: function (doc_or_docs, table=this) {
+    deleteAll: function (returnChanges=false, table=this) {
+        return table.exec(table.scope.delete({returnChanges}));
+    },
+
+    insert: function (doc_or_docs, table=this) {
         return table.exec(table.scope.insert(doc_or_docs));
     },
 

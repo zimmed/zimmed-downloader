@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const Promise = require('bluebird');
 const path = require('path');
 const mktemp = require('mktemp');
 const rmdir = require('rmdir');
@@ -8,11 +9,31 @@ const Login = require('./login');
 const mv = require('../util/move-file');
 const rm = require('../util/remove-file');
 const State = Container.State;
+const dbTable = require('../db')('mgr-finished-files');
 
 
 const TEMP_DIR_MASK = 'dl-XXXXXXXX';
 
 const Manager = module.exports = {
+
+    fileExists: (url) => {
+        return dbTable
+            .get(url)
+            .then(items => items && items.length && items[0])
+            .then(file => _.get(file, state, false));
+    },
+
+    dbClearActive: () => {
+        return dbTable.updateWhere(activePredicate, {state: State.ERROR, log: 'Manager restart'});
+    },
+
+    dbGetQueued: () => {
+        return dbTable.getWhere(file => file('state').eq(State.READY));
+    },
+
+    dbGetActive: () => {
+        return dbTable.getWhere(activePredicate);
+    },
 
     create: ({
         autoStart=true,
@@ -28,7 +49,7 @@ const Manager = module.exports = {
         onDLError=_.noop,
         onDLPause=_.noop,
         onDLQueued=_.noop
-    }={}) => {
+    }={}, queue) => {
         let m = Object.defineProperties({}, {
             state: {
                 value: autoStart ? State.READY : State.PAUSED,
@@ -40,7 +61,7 @@ const Manager = module.exports = {
                 writable: false,
                 configurable: false,
                 enumerable: true,
-                value: []
+                value: queue || []
             },
             active: {
                 writable: false,
@@ -64,14 +85,14 @@ const Manager = module.exports = {
                     maxConnections,
                     maxSpeed,
                     progressTickRate,
-                    onDLProgress,
-                    onDLBegin,
-                    onDLEnd,
-                    onDLComplete,
-                    onDLProcess,
-                    onDLError,
-                    onDLPause,
-                    onDLQueued
+                    onDLProgress: (...args) => onDLProgress(m, ...args),
+                    onDLBegin: (...args) => onDLBegin(m, ...args),
+                    onDLEnd: (...args) => onDLEnd(m, ...args),
+                    onDLComplete: (...args) => onDLComplete(m, ...args),
+                    onDLProcess: (...args) => onDLProcess(m, ...args),
+                    onDLError: (...args) => onDLError(m, ...args),
+                    onDLPause: (...args) => onDLPause(m, ...args),
+                    onDLQueued: (...args) => onDLQueued(m, ...args)
                 }
             }
         });
@@ -82,9 +103,13 @@ const Manager = module.exports = {
     queueDownload: (mgr, dir, metadata, login) => {
         let c = Container.create(dir, metadata, login);
 
-        mgr.queue.push(c);
-        mgr.opts.onDLQueued(c);
-        return mgr.queue.length < mgr.opts.maxConcurrent && mgr.state === State.READY && Manager.run(mgr);
+        return dbTable
+            .insert(c.stripForDB())
+            .then(() => mgr.queue.push(c))
+            .then(() => mgr.opts.onDLQueued(c))
+            .then(() => mgr.active.length < mgr.opts.maxConcurrent)
+            .then(freeSlots => freeSlots && mgr.state === State.READY)
+            .then(ready => ready && Manager.run(mgr));
     },
 
     run: mgr => {
@@ -128,16 +153,18 @@ const Manager = module.exports = {
         let opts = null;
 
         Container.update(con, {state: State.FETCHING});
-        mgr.queue.splice(mgr.queue.indexOf(con), 1);
-        mgr.active.push(con);
-        mgr.opts.onDLBegin(con);
-        Manager.buildOpts(mgr, con)
+        return dbTable
+            .update(con.url, con.stripForDB())
+            .then(() => mgr.queue.splice(mgr.queue.indexOf(con), 1))
+            .then(() => mgr.active.push(con))
+            .then(() => mgr.opts.onDLBegin(con))
+            .then(() => Manager.buildOpts(mgr, con))
             .then(o => (opts = o) && Downloader.preProcess(opts, con.url))
             .then(proc => Container.update(con, {src: proc.src, cookie: proc.cookie}))
             .then(() => Container.update(con, {state: State.DOWNLOADING}))
             .then(() => Downloader.download(opts, con.src, con.name, con.cookie))
             .then(filePath => Manager.moveFile(mgr, con, filePath))
-            .then(finalPath => Container.update(con, {file: finalPath, state: State.COMPLETE}))
+            .then(finalPath => Manager.completeDownload(mgr, con, finalPath))
             .catch(error => Manager.handleError(mgr, opts, con, error))
             .finally(() => Manager.endDownload(mgr, con));
     },
@@ -148,33 +175,40 @@ const Manager = module.exports = {
         return mv(filePath, con.file);
     },
 
+    completeDownload: (mgr, con, finalPath) => {
+        Container.update(con, {file: finalPath, state: State.COMPLETE});
+        mgr.opts.onDLComplete(con);
+    },
+
     handleError: (mgr, opts, con, error) => {
         if (con.name) {
             rm(path.join(opts.dir, con.name));
         }
-        Container.update(con, {state: State.ERROR});
+        Container.update(con, {state: State.ERROR, log: error});
         mgr.opts.onDLError(con, error);
     },
 
     endDownload: (mgr, con) => {
-        mgr.active.splice(mgr.active.indexOf(con), 1);
-        mgr.opts.onDLEnd(con);
-        if (mgr.state === State.READY) {
-            Manager.run(mgr);
-        } else if (!mgr.active.length) {
-            Manager.tearDown(mgr);
-        }
+        return dbTable
+            .update(con.url, con.stripForDB())
+            .then(() => mgr.active.splice(mgr.active.indexOf(con), 1))
+            .then(() => mgr.opts.onDLEnd(con))
+            .then(() => mgr.state === State.READY)
+            .then(ready => ready ? Manager.run : (!mgr.active.length && Manager.tearDown(mgr)));
     },
 
     buildOpts: (mgr, con) => {
-        return Manager.getTempDir(mgr)
-            .then(path => _.assign({
-                dir: path,
-                connections: mgr.opts.maxConnections,
-                concurrent: mgr.opts.maxConcurrent,
-                maxOverallSpeed: mgr.opts.maxSpeed,
-                datastream: Manager.buildDataStream(mgr, con)
-            }, Login.get(con.login)));
+        return Promise.all(Manager.getTempDir(mgr), Login.get(con.login))
+            .spread((path, login) => {
+                return {dir: path,
+                    connections: mgr.opts.maxConnections,
+                    concurrent: mgr.opts.maxConcurrent,
+                    maxOverallSpeed: mgr.opts.maxSpeed,
+                    datastream: Manager.buildDataStream(mgr, con),
+                    user: login.user,
+                    pass: login.pass
+                };
+            });
     },
 
     buildDataStream: (mgr, con) => {
@@ -188,3 +222,8 @@ const Manager = module.exports = {
         };
     }
 };
+
+
+function activePredicate(file) {
+    return file('state').ne(State.READY).and(file('state').ne(State.ERROR).and(file('state').ne(State.COMPLETE)));
+}
