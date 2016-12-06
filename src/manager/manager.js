@@ -6,8 +6,7 @@ const rmdir = require('rmdir');
 const Container = require('./container');
 const Downloader = require('../downloader');
 const Login = require('./login');
-const mv = require('../util/move-file');
-const rm = require('../util/remove-file');
+const {moveFile, removeFile} = require('zimmed-cli');
 const State = Container.State;
 const dbTable = require('../db')('mgr-finished-files');
 
@@ -172,7 +171,7 @@ const Manager = module.exports = {
     moveFile: (mgr, con, filePath) => {
         Container.update(con, {state: State.PROCESSING});
         mgr.opts.onDLProcess(con);
-        return mv(filePath, con.file);
+        return moveFile(filePath, con.file);
     },
 
     completeDownload: (mgr, con, finalPath) => {
@@ -182,7 +181,7 @@ const Manager = module.exports = {
 
     handleError: (mgr, opts, con, error) => {
         if (con.name) {
-            rm(path.join(opts.dir, con.name));
+            removeFile(path.join(opts.dir, con.name));
         }
         Container.update(con, {state: State.ERROR, log: error});
         mgr.opts.onDLError(con, error);

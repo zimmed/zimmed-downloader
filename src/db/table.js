@@ -1,8 +1,8 @@
 const _ = require('lodash');
 const r = require('rethinkdb');
 const {promiseRun} = require('./connection');
-const cache = require('../util/simple-cache')('db');
-const timestamp = require('../util/timestamp');
+const cache = require('zimmed-simple-cache')('db');
+const timestamp = require('zimmed-timestamp');
 const Config = require('../config').database;
 
 const MS = 'ms';

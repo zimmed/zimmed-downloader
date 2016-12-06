@@ -1,16 +1,14 @@
-const _ = require('lodash');
 const key = require('../config').keys.loginAESKey;
-const cypher = require('../util/cypher');
-const Cache = require('../util/simple-cache');
-const timestamp = require('../util/timestamp');
+const cypher = require('zimmed-cypher');
+const timestamp = require('zimmed-timestamp');
 const dbTable = require('../db').table('download-logins');
 
 
 const Login = module.exports = {
 
     create: (domain, user, pass) => {
-        user = cypher.encrypt(user, key);
-        pass = cypher.encrypt(pass, key);
+        user = cypher.aes.encrypt(key, user);
+        pass = cypher.aes.encrypt(key, pass);
         return {id: domain, user, pass};
     },
 
@@ -31,8 +29,8 @@ const Login = module.exports = {
         return Login.getData(domain)
             .then(data => {
                 return {
-                    user: cypher.decrypt(data.user, key),
-                    pass: cypher.decrypt(data.pass, key)
+                    user: cypher.aes.decrypt(key, data.user),
+                    pass: cypher.aes.decrypt(key, data.pass)
                 };
             });
     },

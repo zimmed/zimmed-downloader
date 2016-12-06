@@ -1,9 +1,8 @@
 const _ = require('lodash');
-const cache = require('../util/simple-cache')('auth');
+const cache = require('zimmed-simple-cache')('auth');
 const KEY = require('../config').keys.authHashKey;
-const timestamp = require('../util/timestamp');
-const hash = require('../util/cypher/hash');
-const createKey = require('../util/cypher').createRSA;
+const timestamp = require('zimmed-timestamp');
+const {hash, rsa} = require('zimmed-cypher');
 const Config = require('../config').RSA;
 
 const REQUEST_TIMEOUT = 2000;
@@ -48,7 +47,7 @@ const Auth = {
             params = hmac && ts && guestId;
 
         return params && Auth.hmacIsValid(hmac, ts, guestId) && cache.set(id, {
-                key: createKey(Config.bits, Config.exp),
+                key: rsa.create(Config.bits, Config.exp),
                 id
             });
     },

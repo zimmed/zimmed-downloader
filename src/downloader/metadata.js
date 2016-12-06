@@ -1,7 +1,7 @@
 const proc = require('child_process');
 const Promise = require('bluebird');
 const _ = require('lodash');
-const cmdRequire = require('../util/cmd');
+const cmdRequire = require('zimmed-cli').cmd;
 
 
 // Because WebStorm has dumb inspections
