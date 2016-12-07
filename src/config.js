@@ -70,8 +70,8 @@ module.exports = {
         host: 'localhost',
         port: '32778',
         name: 'Downloader',
-        readyTimeout: 10000, // ms
-        readyTimeoutTick: 5 // ms
+        readyTimeout: 5000, // ms
+        readyTick: 5 // ms
     },
 
     logger: {

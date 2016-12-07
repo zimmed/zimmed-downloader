@@ -1,5 +1,5 @@
 const logger = require('../logger');
-const cache = require('../util/simple-cache')('socket-clients');
+const cache = require('zimmed-simple-cache')('socket-clients');
 
 module.exports = (channel) => (socket, next) => {
     if (cache.has(socket.id)) {

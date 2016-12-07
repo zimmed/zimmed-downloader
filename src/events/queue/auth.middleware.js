@@ -2,7 +2,7 @@ const createError = require('../error');
 const Auth = require('../../auth');
 const logger = require('../../logger');
 const channel = require('./channel');
-const cache = require('../../util/simple-cache')('socket-clients');
+const cache = require('zimmed-simple-cache')('socket-clients');
 
 module.exports = function auth(next, model, event) {
     let parsed = Auth.parseRequest(event, cache.get(this.client.id));

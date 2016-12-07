@@ -3,7 +3,7 @@ const path = require('path');
 const _ = require('lodash');
 const Promise = require('bluebird');
 const Config = require('../config').captcha;
-const cmdRequire = require('../util/cmd');
+const cmdRequire = require('zimmed-cli').cmd;
 
 
 // Because WebStorm has dumb inspections

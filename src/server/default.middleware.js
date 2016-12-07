@@ -1,6 +1,6 @@
 const Auth = require('../auth');
 const logger = require('../logger');
-const cache = require('../util/simple-cache')('socket-clients');
+const cache = require('zimmed-simple-cache')('socket-clients');
 
 module.exports = (socket, next) => {
     let query = socket.handshake.query,
