@@ -23,15 +23,18 @@ Test the following commands to make sure all packages were properly installed (y
 - plowdown
 - aria2c
 
-Next install javascript dependencies: `zimmed-downloader$ npm i`
+Next, add [custom node package repo](https://repo.fury.io/zimmed/) to NPM source. Recommended to use proxy which passes
+through package requests to global npm repo: `$ npm config set registry https://npm-proxy.fury.io/zimmed/ && npm config set ca ""`
+
+Then install javascript dependencies: `zimmed-downloader$ npm i`
 
 Update configuration in `src/config.js` and `src/test-config.js`
 
 [Optional] Run unit tests: `zimmed-downloader$ npm test`
 
-Test server from CLI: `zimmed-downloader$ npm run server`
+Test server from CLI: `zimmed-downloader$ npm start`
 
-_Or if you have previously installed bunyan globally `$ npm i -g bunyan` you can use `zimmed-downloader$ npm run server-pretty`._
+_Or if you have previously installed bunyan globally `$ npm i -g bunyan` you can use `zimmed-downloader$ npm run pretty`._
 
 It is recommended to use a utility for managing the node service, like [pm2](https://github.com/Unitech/pm2 "pm2"), for deployment stability.
 
