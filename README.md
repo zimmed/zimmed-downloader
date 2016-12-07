@@ -9,19 +9,19 @@ home NAS).
 ### Setup
 
 To deploy, first install all the CLI requirements:
-    expect - Most linux distros come with this, on OSX you will need to install the package manually with homebrew.
-    plowshare - This is the utility that parses filesharing links into useful download links.
-            It can be installed through most package managers. e.g., sudo yum install plowshare
-    plowshare modules - Plowshare requires external modules for specific file sharing sites you intend to use.
+- expect - Most linux distros come with this, on OSX you will need to install the package manually with homebrew.
+- plowshare - This is the utility that parses filesharing links into useful download links. It can be installed through
+            most package managers. e.g., sudo yum install plowshare
+- plowshare modules - Plowshare requires external modules for specific file sharing sites you intend to use.
             This has only been tested for rapidgator.net and uploaded.net. Use of other shares may require modifications
             to the core code. See: https://github.com/mcrapet/plowshare-modules-legacy
-    aria2 - The download utility which utlizies multiple connections (beneficial for premium downloads).
+- aria2 - The download utility which utlizies multiple connections (beneficial for premium downloads).
 
 Test the following commands to make sure all packages were properly installed (you can use `$ which <cmd>`):
-    * unbuffer
-    * plowprobe
-    * plowdown
-    * aria2c
+- unbuffer
+- plowprobe
+- plowdown
+- aria2c
 
 Next install javascript dependencies: `zimmed-downloader$ npm i`
 
@@ -31,7 +31,9 @@ Update configuration in `src/config.js` and `src/test-config.js`
 
 Test server from CLI: `zimmed-downloader$ npm run server`
 
-It is recommended to use a utility for managing the node service, like pm2, for deployment stability.
+_Or if you have previously installed bunyan globally `$ npm i -g bunyan` you can use `zimmed-downloader$ npm run server-pretty`._
+
+It is recommended to use a utility for managing the node service, like [pm2](https://github.com/Unitech/pm2 "pm2"), for deployment stability.
 
 ### Legal
 
