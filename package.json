@@ -1,6 +1,6 @@
 {
   "name": "zimmed-downloader",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "REQUIRES PLOWSHARE. Node layer for secure downloading via shell scripts",
   "main": "src/index.js",
   "scripts": {
