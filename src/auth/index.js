@@ -3,9 +3,9 @@ const cache = require('zimmed-simple-cache')('auth');
 const KEY = require('../config').keys.authHashKey;
 const timestamp = require('zimmed-timestamp');
 const {hash, rsa} = require('zimmed-cypher');
-const Config = require('../config').RSA;
+const Config = require('../config');
 
-const REQUEST_TIMEOUT = 2000;
+const REQUEST_TIMEOUT = Config.server.requestTimeout;
 
 const Auth = {
 
@@ -47,7 +47,7 @@ const Auth = {
             params = hmac && ts && guestId;
 
         return params && Auth.hmacIsValid(hmac, ts, guestId) && cache.set(id, {
-                key: rsa.create(Config.bits, Config.exp),
+                key: rsa.create(Config.RSA.bits, Config.RSA.exp),
                 id
             });
     },

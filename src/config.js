@@ -20,6 +20,7 @@ module.exports = {
             default: {eventPath: 'src/events'}, // [x] Relative path to server events directory for default socket channel
             queue: {eventPath: 'src/events/queue'} // [x] Event path for queue updates channel
         },
+        requestTimeout: 1000,
     },
 
     keys: {
