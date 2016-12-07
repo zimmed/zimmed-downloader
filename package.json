@@ -1,10 +1,10 @@
 {
   "name": "zimmed-downloader",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "REQUIRES PLOWSHARE. Node layer for secure downloading via shell scripts",
   "main": "src/index.js",
   "scripts": {
-    "test": "mocha '*/**/*.spec.js'",
+    "test": "./node_modules/.bin/mocha '*/**/*.spec.js'",
     "start": "node app.js",
     "start-pretty": "npm run server | bunyan"
   },
