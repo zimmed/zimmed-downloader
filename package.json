@@ -6,7 +6,7 @@
   "scripts": {
     "test": "./node_modules/.bin/mocha '*/**/*.spec.js'",
     "start": "node app.js",
-    "start-pretty": "npm run server | bunyan"
+    "pretty": "npm run server | bunyan"
   },
   "author": "zimmed@zimmed.io",
   "license": "MIT",
