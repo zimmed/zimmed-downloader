@@ -14,18 +14,18 @@
     "chai": "^3.5.0",
     "mocha": "^3.2.0"
   },
+  "bugs": {
+    "url": "https://github.com/zimmed/zimmed-downloader/issues"
+  },
+  "homepage": "https://github.com/zimmed/zimmed-downloader",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zimmed/zimmed-downloader"
+  },
   "dependencies": {
     "bluebird": "^3.4.6",
     "bunyan": "^1.8.5",
-    "command-exists": "^1.0.2",
-    "express": "^4.14.0",
-    "glob": "^7.1.1",
     "lodash": "^4.17.2",
-    "mktemp": "^0.4.0",
-    "node-rsa": "^0.4.2",
-    "rethinkdb": "^2.3.3",
-    "rmdir": "^1.2.0",
-    "socket.io": "^1.7.1",
     "zimmed-bytesize": "^1.0.0",
     "zimmed-cli": "^1.0.0",
     "zimmed-cypher": "^1.0.1",
