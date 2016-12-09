@@ -17,12 +17,12 @@ module.exports = function mgrQueue(mgr, data) {
                 tryQ(mgr, dir, login, metadata)
             )))
             .then(() => {
-                this.client.emit('mgr-queue.success', Auth.response(out));
+                this.client.emit('mgr-queue.success', Auth.response(out, true));
             })
             .catch(e => {
-                this.client.emit('mgr-queue.failure', Auth.response(createError('400', e)));
+                this.client.emit('mgr-queue.failure', Auth.response(createError('400', e), true));
             })
-        : this.client.emit('mgr-queue.failure', Auth.response(createError('400')));
+        : this.client.emit('mgr-queue.failure', Auth.response(createError('400'), true));
 };
 
 function tryQ(mgr, dir, login, metadata) {
