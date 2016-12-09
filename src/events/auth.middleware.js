@@ -1,18 +1,22 @@
-const createError = require('./error');
 const Auth = require('../auth');
 const logger = require('../logger');
-const cache = require('zimmed-simple-cache')('socket-clients');
+
+let rejectCount = 0;
+const rejectMax = 5;
 
 module.exports = function auth(next, model, event) {
-    let parsed = Auth.parseRequest(event, cache.get(this.client.id));
+    let parsed = Auth.parseRequest(event);
 
     if (parsed === null) {
-        logger.debug(`Auth Middleware rejected for ${this.client.id}: ${(JSON).stringify(parsed)}`);
-        this.client.emit('disconnect', Auth.response(createError('401')));
-        this.client.disconnect();
-        cache.del(this.client.id);
+        logger.warn(`Auth Middleware rejected: ${(JSON).stringify(parsed)}`);
+        if (rejectCount < rejectMax) {
+            rejectCount += 1;
+        } else {
+            this.disconnect();
+            logger.error(`Disconnected from host after ${rejectMax} requests failed authentication.`);
+        }
     } else {
-        logger.debug(`Auth Middleware accepted for ${this.client.id}: ${(JSON).stringify(parsed)}`);
+        logger.debug(`Auth Middleware accepted: ${(JSON).stringify(parsed)}`);
         next(model, parsed);
     }
 };
