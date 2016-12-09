@@ -1,5 +1,3 @@
-const _ = require('lodash');
-const path = require('path');
 const Auth = require('./auth');
 const SocketManager = require('zimmed-socket-client');
 const EventManager = require('zimmed-event');
