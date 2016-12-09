@@ -1,38 +1,30 @@
 const _ = require('lodash');
 const Manager = require('../manager');
-const Downloader = require('../downloader');
-const createError = require('./error');
 const Config = require('../config');
 const Auth = require('../auth');
 
-module.exports = function mgrQueue(mgr, data) {
-    let {destination, login, urls} = data,
-        out = _.map(urls, url => { return {url, success: false, error: 'bad link'}; }),
-        dir = _.get(Config.libraries, destination, false);
+const OK = 0;
 
-    return dir && urls
-        ? Downloader.getMetadata(...urls)
-            .then(arr => _.forEach(arr, metadata => _.assign(
-                _.find(out, {url: metadata.url}),
-                tryQ(mgr, dir, login, metadata)
-            )))
-            .then(() => {
-                this.client.emit('mgr-queue.success', Auth.response(out, true));
-            })
-            .catch(e => {
-                this.client.emit('mgr-queue.failure', Auth.response(createError('400', e), true));
-            })
-        : this.client.emit('mgr-queue.failure', Auth.response(createError('400'), true));
+module.exports = function mgrQueue(mgr, data) {
+    let {destination, login, links} = data,
+        dir = _.get(Config.libraries, destination, false),
+        socket = this,
+        out = _.map(links, meta=> {
+            let e = meta.state === OK ? tryQ(mgr, dir, login, meta) : (meta.state !== OK && new Error('Bad link'));
+
+            return e ? {url: meta.url, success: false, error: e} : {url: meta.url, success: true};
+        });
+
+    socket.emit('mgr-queue-response', Auth.response(out, true));
 };
 
 function tryQ(mgr, dir, login, metadata) {
-    let out;
+    let out = false;
 
     try {
         Manager.queueDownload(mgr, dir, login, metadata);
-        out = {success: true};
     } catch (e) {
-        out = {success: false, error: e};
+        out = e;
     }
     return out;
 }

@@ -1,19 +1,9 @@
 const _ = require('lodash');
-const getFileData = require('./metadata');
 const generateDownloadLink = require('./generatedl');
 const downloadFile = require('./download');
 
 
 const Downloader = module.exports = {
-
-    /**
-     * Grab metadata from one or more URLs
-     * @param {...string} urls - The FileShare URLs from which metadata should be grabbed
-     * @return {Promise<Array|Object>} - Resolves to array containing metadata objects for each URL
-     */
-    getMetadata: (...urls) => {
-        return getFileData(...urls);
-    },
 
     /**
      * Pre-process file-sharing public link for download
