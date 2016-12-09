@@ -1,12 +1,9 @@
-const _ = require('lodash');
-const Auth = require('../auth');
-const createError = require('./error');
-const Config = require('../config').server;
+module.exports = function subscribe(mgr) {
+    let socket = this,
+        queueUpdate = (mgr_, con) => {
+            socket.emit('mgr-queue-update', con.stripForUpdate());
+        };
 
-module.exports = function mgrSubscribe(mgr, channel) {
-    if (_.has(Config.channels, channel)) {
-        this.client.join(channel);
-    } else {
-        this.client.emit('subscribe-failure', Auth.response(createError('400')));
-    }
+    mgr.opts.onDLProcess = queueUpdate;
+    mgr.opts.onDLProgress = queueUpdate;
 };
