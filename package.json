@@ -32,7 +32,7 @@
     "zimmed-event": "^1.0.0",
     "zimmed-rethink": "^1.0.1",
     "zimmed-simple-cache": "^1.0.1",
-    "zimmed-socket": "^1.0.2",
+    "zimmed-socket-client": "^1.0.0",
     "zimmed-timestamp": "^1.0.0"
   }
 }
