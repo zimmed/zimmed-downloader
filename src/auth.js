@@ -2,7 +2,7 @@ const _ = require('lodash');
 const cache = require('zimmed-simple-cache')('auth');
 const timestamp = require('zimmed-timestamp');
 const {hash, rsa} = require('zimmed-cypher');
-const Config = require('../config');
+const Config = require('./config');
 
 
 const KEY = Config.service.apiKey;
