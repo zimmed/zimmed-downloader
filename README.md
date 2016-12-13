@@ -23,10 +23,12 @@ Test the following commands to make sure all packages were properly installed (y
 - plowdown
 - aria2c
 
-Next, add [custom node package repo](https://repo.fury.io/zimmed/) to NPM source. Recommended to use proxy which passes
+Next, install (or get info for pre-existing) [RethinkDB](https://rethinkdb.com/) service.
+
+Then add [custom node package repo](https://repo.fury.io/zimmed/) to NPM source. Recommended to use proxy which passes
 through package requests to global npm repo: `$ npm config set registry https://npm-proxy.fury.io/zimmed/ && npm config set ca ""`
 
-Then install javascript dependencies: `zimmed-downloader$ npm i`
+Install javascript dependencies: `zimmed-downloader$ npm i`
 
 Update configuration in `src/config.js` and `src/test-config.js`
 
